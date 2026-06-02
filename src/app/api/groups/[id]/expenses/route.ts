@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/lib/auth";
 import { expenseService, ExpenseServiceError } from "@/services/expenseService";
 import { SplitType } from "@prisma/client";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -13,7 +13,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const expenses = await expenseService.getGroupExpenses((await params).id, session.user.id);
+    const { id } = await params;
+    const expenses = await expenseService.getGroupExpenses(id, session.user.id);
     return NextResponse.json(expenses);
   } catch (error) {
     if (error instanceof ExpenseServiceError) {
@@ -25,7 +26,7 @@ export async function GET(
 }
 
 export async function POST(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -37,8 +38,9 @@ export async function POST(
     const body = await req.json();
     const { paidById, description, amountInPaise, splitType, participants } = body;
 
+    const { id } = await params;
     const expense = await expenseService.createExpense(
-      (await params).id,
+      id,
       session.user.id,
       paidById,
       description,

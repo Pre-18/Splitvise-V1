@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/lib/auth";
 import { expenseService, ExpenseServiceError } from "@/services/expenseService";
 import { SplitType } from "@prisma/client";
 
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string; expenseId: string }> }
 ) {
   try {
@@ -16,9 +16,10 @@ export async function PUT(
     const body = await req.json();
     const { paidById, description, amountInPaise, splitType, participants } = body;
 
+    const { id, expenseId } = await params;
     const expense = await expenseService.updateExpense(
-      (await params).id,
-      (await params).expenseId,
+      id,
+      expenseId,
       session.user.id,
       paidById,
       description,
@@ -38,7 +39,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string; expenseId: string }> }
 ) {
   try {
@@ -47,7 +48,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await expenseService.deleteExpense((await params).id, (await params).expenseId, session.user.id);
+    const { id, expenseId } = await params;
+    await expenseService.deleteExpense(id, expenseId, session.user.id);
     return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof ExpenseServiceError) {

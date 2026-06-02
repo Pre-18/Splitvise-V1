@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/lib/auth";
 import { settlementService, SettlementServiceError } from "@/services/settlementService";
 
 export async function POST(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -15,8 +15,9 @@ export async function POST(
     const body = await req.json();
     const { payerId, payeeId, amountInPaise } = body;
 
+    const { id } = await params;
     const settlement = await settlementService.createSettlement(
-      (await params).id,
+      id,
       session.user.id,
       payerId,
       payeeId,

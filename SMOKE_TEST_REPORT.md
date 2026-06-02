@@ -12,7 +12,7 @@
 
 ## Test 4: Create group
 - **Expected**: Group created, Alice is owner and member
-- **Actual**: Owner ID: b56b2296-e9d0-4c09-acbc-98e3815ad34f, Member Count: 1
+- **Actual**: Owner ID: 7ff34047-3228-47ed-9193-bd5cebe9e075, Member Count: 1
 - **Status**: ✅ PASS
 
 ## Test 5: Add Bob by email

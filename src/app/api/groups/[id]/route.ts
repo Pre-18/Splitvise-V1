@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/lib/auth";
 import { groupService, GroupServiceError } from "@/services/groupService";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -12,7 +12,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const groupDetails = await groupService.getGroupDetails((await params).id, session.user.id);
+    const { id } = await params;
+    const groupDetails = await groupService.getGroupDetails(id, session.user.id);
     return NextResponse.json(groupDetails);
   } catch (error) {
     if (error instanceof GroupServiceError) {

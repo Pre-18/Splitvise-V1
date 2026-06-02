@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/lib/auth";
 import { activityService, ActivityServiceError } from "@/services/activityService";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -12,7 +12,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const activity = await activityService.getGroupActivity((await params).id, session.user.id);
+    const { id } = await params;
+    const activity = await activityService.getGroupActivity(id, session.user.id);
     return NextResponse.json(activity);
   } catch (error) {
     if (error instanceof ActivityServiceError) {

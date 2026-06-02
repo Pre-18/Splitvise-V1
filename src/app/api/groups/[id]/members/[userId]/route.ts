@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerAuthSession } from "@/lib/auth";
 import { groupService, GroupServiceError } from "@/services/groupService";
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
@@ -12,7 +12,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await groupService.removeMember((await params).id, session.user.id, (await params).userId);
+    const { id, userId } = await params;
+    await groupService.removeMember(id, session.user.id, userId);
     return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof GroupServiceError) {

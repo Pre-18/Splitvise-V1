@@ -10,26 +10,29 @@ import { RemoveMemberButton } from "@/components/groups/RemoveMemberButton";
 import { CreateExpenseModal } from "@/components/expenses/CreateExpenseModal";
 import { SettleUpModal } from "@/components/settlements/SettleUpModal";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
+import { db } from "@/lib/db";
 
 export default async function GroupDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await getServerAuthSession();
   if (!session?.user?.id) {
     redirect("/login");
   }
 
+  const { id } = await params;
+
   try {
     const { group, members, memberCount, isOwner } = await groupService.getGroupDetails(
-      params.id,
+      id,
       session.user.id
     );
 
     const [expenses, groupBalances] = await Promise.all([
-      expenseService.getGroupExpenses(params.id, session.user.id),
-      balanceEngine.calculateGroupBalances(params.id),
+      expenseService.getGroupExpenses(id, session.user.id),
+      balanceEngine.calculateGroupBalances(id),
     ]);
 
     // Map member names for the UI edges
